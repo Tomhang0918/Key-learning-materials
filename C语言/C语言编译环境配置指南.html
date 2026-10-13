@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C 语言编译环境配置指南（Dev-C++ / 在线编译器 / VS Code 三路线）</title>
+<style>
+  :root{
+    --ink:#1f2933; --sub:#52606d; --line:#d9e2ec; --bg:#ffffff;
+    --win:#0a66c2; --mac:#555; --accent:#0891b2; --code:#f5f7fa;
+    --tip:#e6f6ff; --warn:#fff4e5; --ok:#e9f9ef;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,Roboto,sans-serif;
+    color:var(--ink);background:#f0f3f7;line-height:1.7;font-size:15px;}
+  .wrap{max-width:920px;margin:0 auto;background:var(--bg);padding:32px 40px 60px;
+    box-shadow:0 2px 16px rgba(0,0,0,.06);}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:.5px;}
+  h2{font-size:20px;margin:38px 0 12px;padding-left:12px;border-left:5px solid var(--accent);}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--sub);}
+  .lead{color:var(--sub);margin:0 0 8px;}
+  .tag{display:inline-block;font-size:12px;padding:2px 10px;border-radius:20px;color:#fff;font-weight:600;}
+  .tag.win{background:var(--win);} .tag.mac{background:var(--mac);}
+  .step{display:flex;gap:14px;align-items:flex-start;margin:14px 0;padding:14px 16px;
+    background:#fafbfc;border:1px solid var(--line);border-radius:10px;}
+  .step .n{flex:0 0 30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .step .b{flex:1;}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 14px;
+    overflow:auto;font-family:"SFMono-Regular",Consolas,Menlo,monospace;font-size:13px;line-height:1.6;}
+  code{background:var(--code);padding:1px 6px;border-radius:4px;font-family:Consolas,Menlo,monospace;font-size:13px;}
+  .fig{margin:14px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;}
+  .fig .cap{background:#f7f9fc;font-size:12px;color:var(--sub);padding:6px 12px;border-top:1px solid var(--line);}
+  .fig svg{display:block;width:100%;height:auto;}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+  th{background:#f7f9fc;}
+  .box{border-radius:10px;padding:12px 16px;margin:14px 0;}
+  .box.tip{background:var(--tip);border:1px solid #bae3ff;}
+  .box.warn{background:var(--warn);border:1px solid #ffd8a8;}
+  .box.ok{background:var(--ok);border:1px solid #b2f2dd;}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:680px){.twocol{grid-template-columns:1fr;}}
+  .pill{font-weight:700;}
+  .foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--sub);font-size:13px;}
+  @media print{
+    body{background:#fff;} .wrap{box-shadow:none;max-width:100%;padding:0 8mm;}
+    .fig,.step,table{break-inside:avoid;}
+    a{color:var(--ink);text-decoration:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>C 语言编译环境配置指南</h1>
+<p class="lead">三条路线任选：① Dev-C++（学习通安装包，Windows 教学统一环境）② 在线编译器（零安装，Mac 适用）③ VS Code 本地完整版（进阶）。同一份 <code>.c</code> 代码全部通用。</p>
+<p><span class="tag win">Windows</span> <span class="tag mac">macOS</span> 编译器分别用 <b>gcc (MinGW-w64)</b> 与 <b>clang (Xcode 命令行工具)</b>，功能等价。</p>
+
+<div class="box tip">
+  <b>一句话：</b>VS Code 只是「写代码的编辑器」，真正把 C 变成程序的是<b>编译器</b>。Windows 装 MinGW-w64，Mac 装 Xcode 命令行工具，再装一个 C/C++ 扩展，就能跑了。
+</div>
+
+<h2>🟢 新生极简路线（推荐先看这个）</h2>
+<div class="box ok">
+  <b>别被下面那一大篇吓到。</b>两条极简路：<b>Windows 直接装学习通里的 Dev-C++ 安装包</b>（自带编译器，装完按 F11 就跑）；<b>Mac 或临时写代码用在线编译器</b>（开网页即用）。都不用配环境、不用敲命令。
+</div>
+<table>
+  <tr><th>路线</th><th>适合</th><th>安装量</th><th>上手</th></tr>
+  <tr><td><b>① Dev-C++</b>（学习通下载，Windows）</td><td>所有 Windows 同学（教学统一环境）</td><td>1 个安装包，下一步到底</td><td>3 分钟</td></tr>
+  <tr><td><b>② 在线编译器</b>（OnlineGDB / Programiz）</td><td>Mac 同学、临时写、怕麻烦</td><td>0（开网页即用）</td><td>1 分钟</td></tr>
+  <tr><td>③ VS Code 本地完整版（下文）</td><td>想搞懂编译/调试、长期用</td><td>装软件+编译器+配环境</td><td>15 分钟</td></tr>
+</table>
+<div class="box tip"><b>老师建议：</b>上课统一用 Dev-C++，安装包就在学习通「课程材料和软件」里（<code>Dev-Cpp_5.11_TDM-GCC_4.9.2_Setup.exe</code>，自带 TDM-GCC 编译器）。家里用 Mac 或嫌麻烦的同学，走<b>路线②在线编译器</b>，代码和 Dev-C++ 完全通用，作业复制过去就能交。</div>
+
+<h2>路线①：Dev-C++（教学统一环境，Windows）</h2>
+<div class="step"><div class="n">1</div><div class="b">登录学习通 → 课程 → 「课程材料和软件」，下载 <code>Dev-Cpp_5.11_TDM-GCC_4.9.2_Setup.exe</code>（推荐，自带编译器）；或 <code>Dev-Cpp5.4.0.zip</code> 绿色版，解压即用。</div></div>
+<div class="step"><div class="n">2</div><div class="b">双击安装包一路「下一步」。TDM-GCC 编译器已打包在内，<b>不用另装编译器、不用配 PATH</b>。安装器没中文没关系，装完可切。</div></div>
+<div class="step"><div class="n">3</div><div class="b">打开 Dev-C++：「File → New → Source File」写代码，保存为 <code>.c</code>，按 <b>F11</b> 编译并运行（F9 只编译、F10 只运行），弹窗看输出。</div></div>
+<div class="box tip">想要中文界面：装完后 <b>Tools → Editor Options → General → Language</b> 选 Chinese。常见中文报错见本目录《DevC中文报错方案》。<b>Dev-C++ 没有 Mac 版</b>，Mac 同学请走路线②。</div>
+
+<h2>路线②：在线编译器（Mac / 零安装）</h2>
+<div class="step"><div class="n">1</div><div class="b">浏览器打开 <code>https://www.onlinegdb.com</code>（或 <code>https://www.programiz.com/c-programming/online-compiler</code>），左上角语言选 <b>C</b>。</div></div>
+<div class="step"><div class="n">2</div><div class="b">左边写代码（示例可清空重写），写完点绿色 <b>Run</b> 按钮，右边出结果。</div></div>
+<div class="fig">
+<svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="680" height="240" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect x="0" y="0" width="680" height="34" fill="#2563eb"/>
+  <text x="16" y="22" fill="#fff" font-size="13" font-family="sans-serif">OnlineGDB — C Online Compiler</text>
+  <rect x="120" y="44" width="90" height="26" rx="4" fill="#16a34a"/>
+  <text x="165" y="62" fill="#fff" font-size="13" font-weight="700" text-anchor="middle" font-family="sans-serif">Run ▶</text>
+  <text x="16" y="58" fill="#334155" font-size="12" font-family="sans-serif">Language: C</text>
+  <rect x="16" y="84" width="320" height="140" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="28" y="108" fill="#be123c" font-size="12" font-family="monospace">#include &lt;stdio.h&gt;</text>
+  <text x="28" y="130" fill="#1e293b" font-size="12" font-family="monospace">int main(){</text>
+  <text x="44" y="150" fill="#1e293b" font-size="12" font-family="monospace">printf("Hi\n");</text>
+  <text x="28" y="170" fill="#1e293b" font-size="12" font-family="monospace">return 0;</text>
+  <text x="28" y="190" fill="#1e293b" font-size="12" font-family="monospace">}</text>
+  <rect x="352" y="84" width="312" height="140" rx="6" fill="#0f172a"/>
+  <text x="364" y="108" fill="#22c55e" font-size="12" font-family="monospace">$ ./a.out</text>
+  <text x="364" y="134" fill="#e2e8f0" font-size="14" font-family="monospace">Hi</text>
+  <text x="364" y="204" fill="#94a3b8" font-size="11" font-family="sans-serif">← 输出结果</text>
+</svg>
+  <div class="cap">图 0：在线编译器界面（示意图：左边写代码，右边出结果，点 Run 即可）</div>
+</div>
+<div class="box ok"><b>优点：</b>Win / Mac / 手机 / 平板都能用，不用装任何东西，不怕环境配错。<b>缺点：</b>要联网；多文件大作业不方便（那时再学本地版）。</div>
+
+<h2>路线③：VS Code 本地完整版（进阶 / 想学编译原理用）</h2>
+<div class="box warn">下面这部分需要装编译器、配环境变量、敲终端命令。新生如果只想把作业跑起来，<b>看完路线①或②就够了，可以跳过这一节</b>。</div>
+
+<h2>0. 你需要准备什么（仅路线③用到）</h2>
+<table>
+  <tr><th>项目</th><th><span class="tag win">Windows</span></th><th><span class="tag mac">macOS</span></th></tr>
+  <tr><td>编辑器</td><td colspan="2" style="text-align:center">VS Code（两平台同一安装包思路）</td></tr>
+  <tr><td>编译器</td><td>MinGW-w64（gcc）</td><td>Xcode Command Line Tools（clang）</td></tr>
+  <tr><td>扩展</td><td colspan="2" style="text-align:center">Microsoft「C/C++」扩展（两平台相同）</td></tr>
+  <tr><td>验证命令</td><td><code>gcc --version</code></td><td><code>clang --version</code></td></tr>
+</table>
+
+<h2>1. 安装 VS Code（两平台一样）</h2>
+<div class="step"><div class="n">1</div><div class="b">
+  打开官网 <code>https://code.visualstudio.com</code>，点页面中央的 <b>Download</b>。网站会自动识别你的系统（Windows 给 <code>.exe</code>，Mac 给 <code>.zip</code>）。
+</div></div>
+<div class="fig">
+<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="680" height="300" fill="#eef2f7"/>
+  <rect x="40" y="24" width="600" height="252" rx="10" fill="#fff" stroke="#cbd5e1"/>
+  <rect x="40" y="24" width="600" height="34" rx="10" fill="#1e293b"/>
+  <circle cx="62" cy="41" r="5" fill="#ef4444"/><circle cx="80" cy="41" r="5" fill="#f59e0b"/><circle cx="98" cy="41" r="5" fill="#22c55e"/>
+  <text x="320" y="47" fill="#e2e8f0" font-size="13" text-anchor="middle" font-family="sans-serif">code.visualstudio.com</text>
+  <text x="360" y="118" fill="#0f172a" font-size="26" font-weight="700" text-anchor="middle" font-family="sans-serif">Visual Studio Code</text>
+  <text x="360" y="148" fill="#64748b" font-size="13" text-anchor="middle" font-family="sans-serif">Code editing. Redefined.</text>
+  <rect x="285" y="178" width="150" height="40" rx="6" fill="#0a66c2"/>
+  <text x="360" y="203" fill="#fff" font-size="15" font-weight="700" text-anchor="middle" font-family="sans-serif">Download</text>
+  <text x="360" y="244" fill="#94a3b8" font-size="12" text-anchor="middle" font-family="sans-serif">Windows 用户下载 .exe ｜ Mac 用户下载 .zip</text>
+</svg>
+  <div class="cap">图 1：VS Code 官网下载页（示意图）</div>
+</div>
+<div class="step"><div class="n">2</div><div class="b">
+  <b>Windows：</b>双击 <code>.exe</code>，一路「下一步」，建议勾选 <b>“添加到 PATH”</b> 和 <b>“添加到右键菜单”</b>。<br>
+  <b>Mac：</b>解压 <code>.zip</code>，把 <code>Visual Studio Code.app</code> 拖进「应用程序」文件夹即可。
+</div></div>
+
+<h2>2. 安装 C/C++ 扩展（两平台一样）</h2>
+<div class="step"><div class="n">1</div><div class="b">打开 VS Code，按 <code>Ctrl+Shift+X</code>（Mac 用 <code>Cmd+Shift+X</code>）打开扩展栏，搜索 <code>C/C++</code>，安装微软出品的那一个（作者 Microsoft，下载量最高）。</div></div>
+<div class="fig">
+<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="680" height="300" fill="#1e1e1e"/>
+  <rect x="0" y="0" width="48" height="300" fill="#333333"/>
+  <rect x="48" y="0" width="180" height="300" fill="#252526"/>
+  <rect x="60" y="14" width="150" height="22" rx="4" fill="#3c3c3c"/>
+  <text x="70" y="29" fill="#9da5b4" font-size="11" font-family="sans-serif">搜索扩展…</text>
+  <text x="60" y="64" fill="#fff" font-size="13" font-weight="700" font-family="sans-serif">C/C++</text>
+  <text x="60" y="86" fill="#858585" font-size="11" font-family="sans-serif">Microsoft ｜ 已安装 1亿+</text>
+  <rect x="60" y="100" width="120" height="26" rx="4" fill="#0e639c"/>
+  <text x="120" y="117" fill="#fff" font-size="12" text-anchor="middle" font-family="sans-serif">已安装</text>
+  <text x="60" y="150" fill="#fff" font-size="13" font-weight="700" font-family="sans-serif">C/C++</text>
+  <text x="60" y="172" fill="#858585" font-size="11" font-family="sans-serif">Microsoft ｜ 已安装 9千万+</text>
+  <rect x="60" y="186" width="120" height="26" rx="4" fill="#0e639c"/>
+  <text x="120" y="203" fill="#fff" font-size="12" text-anchor="middle" font-family="sans-serif">已安装</text>
+  <text x="60" y="252" fill="#6a9955" font-size="11" font-family="sans-serif">其他结果省略…</text>
+  <rect x="248" y="0" width="432" height="300" fill="#1e1e1e"/>
+  <text x="268" y="40" fill="#fff" font-size="15" font-weight="700" font-family="sans-serif">扩展：C/C++</text>
+  <text x="268" y="70" fill="#9da5b4" font-size="12" font-family="sans-serif">C/C++ IntelliSense, debugging, and code browsing.</text>
+  <line x1="248" y1="86" x2="680" y2="86" stroke="#3c3c3c"/>
+  <text x="268" y="120" fill="#cccccc" font-size="12" font-family="sans-serif">• 语法高亮与自动补全</text>
+  <text x="268" y="148" fill="#cccccc" font-size="12" font-family="sans-serif">• 跳转到定义 / 查引用</text>
+  <text x="268" y="176" fill="#cccccc" font-size="12" font-family="sans-serif">• 集成调试（可选）</text>
+  <rect x="540" y="120" width="110" height="30" rx="4" fill="#0e639c"/>
+  <text x="595" y="140" fill="#fff" font-size="12" text-anchor="middle" font-family="sans-serif">安装 / 已安装</text>
+</svg>
+  <div class="cap">图 2：安装 Microsoft「C/C++」扩展（示意图，深色界面为 VS Code 默认）</div>
+</div>
+
+<h2>3. 安装编译器（两平台不同）</h2>
+
+<div class="twocol">
+  <div>
+    <h3><span class="tag win">Windows</span> 装 MinGW-w64</h3>
+    <div class="step"><div class="n">1</div><div class="b">推荐用 <b>MSYS2</b>：官网 <code>https://www.msys2.org</code> 下载安装，装完打开「MSYS2 UCRT64」终端。</div></div>
+    <div class="step"><div class="n">2</div><div class="b">在终端执行：</div></div>
+    <pre>pacman -S --needed base-devel mingw-w64-ucrt-x86_64-gcc</pre>
+    <div class="step"><div class="n">3</div><div class="b">把 <code>C:\msys64\ucrt64\bin</code> 加入系统 <b>PATH</b> 环境变量，然后<b>重开</b>所有终端/VS Code。</div></div>
+    <div class="box tip">嫌 MSYS2 麻烦？可直接下 <b>winlibs</b> 的 zip 包（<code>winlibs.com</code>），解压后把里面的 <code>bin</code> 目录加入 PATH 即可，无需安装器。</div>
+  </div>
+  <div>
+    <h3><span class="tag mac">macOS</span> 装 Xcode 命令行工具</h3>
+    <div class="step"><div class="n">1</div><div class="b">打开「终端」（启动台搜 Terminal），输入一行命令：</div></div>
+    <pre>xcode-select --install</pre>
+    <div class="step"><div class="n">2</div><div class="b">弹窗点「安装」，等进度条走完（约几分钟）。这就装好了 <code>clang</code> 编译器。</div></div>
+    <div class="box tip">不用装完整的 Xcode（几个 GB）。命令行工具只有几百 MB，足够写 C 语言课程所有程序。</div>
+  </div>
+</div>
+
+<div class="step"><div class="n">✓</div><div class="b">验证安装：打开 VS Code 的集成终端（<code>Ctrl+`</code> 反引号，Mac 用 <code>Cmd+`</code>），分别输入下面命令，能看到版本号就成功了。</div></div>
+<div class="fig">
+<svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg">
+  <rect width="680" height="230" fill="#1e1e1e"/>
+  <text x="20" y="28" fill="#569cd6" font-size="13" font-family="monospace">VS Code 集成终端（Terminal）</text>
+  <line x1="0" y1="40" x2="680" y2="40" stroke="#3c3c3c"/>
+  <text x="20" y="68" fill="#d4d4d4" font-size="13" font-family="monospace"><tspan fill="#6a9955"># Windows</tspan></text>
+  <text x="20" y="92" fill="#d4d4d4" font-size="13" font-family="monospace">C:\&gt; gcc --version</text>
+  <text x="40" y="112" fill="#9cdcfe" font-size="12" font-family="monospace">gcc (MinGW-W64 x86_64) 13.2.0</text>
+  <text x="20" y="148" fill="#d4d4d4" font-size="13" font-family="monospace"><tspan fill="#6a9955"># macOS</tspan></text>
+  <text x="20" y="172" fill="#d4d4d4" font-size="13" font-family="monospace">$ clang --version</text>
+  <text x="40" y="192" fill="#9cdcfe" font-size="12" font-family="monospace">Apple clang version 15.0.0 (clang-1500.0.40.1)</text>
+  <text x="20" y="216" fill="#6a9955" font-size="12" font-family="monospace">看到版本号 = 安装成功 ✓</text>
+</svg>
+  <div class="cap">图 3：在集成终端验证编译器（示意图）</div>
+</div>
+
+<h2>4. 写第一个程序</h2>
+<div class="step"><div class="n">1</div><div class="b">新建文件夹（如 <code>hello</code>），用 VS Code 打开它（菜单「文件 → 打开文件夹」）。</div></div>
+<div class="step"><div class="n">2</div><div class="b">在左侧资源管理器点「新建文件」，命名为 <code>hello.c</code>，输入下面的代码：</div></div>
+<pre>#include &lt;stdio.h&gt;
+
+int main() {
+    printf("Hello, C!\n");
+    return 0;
+}</pre>
+<div class="fig">
+<svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg">
+  <rect width="680" height="280" fill="#1e1e1e"/>
+  <rect x="0" y="0" width="170" height="280" fill="#252526"/>
+  <text x="14" y="26" fill="#cccccc" font-size="12" font-weight="700" font-family="sans-serif">资源管理器</text>
+  <text x="14" y="56" fill="#4ec9b0" font-size="13" font-family="sans-serif">📁 hello</text>
+  <text x="34" y="80" fill="#fff" font-size="13" font-family="sans-serif">📄 hello.c</text>
+  <line x1="0" y1="96" x2="170" y2="96" stroke="#3c3c3c"/>
+  <rect x="0" y="96" width="10" height="184" fill="#1e1e1e"/>
+  <rect x="170" y="0" width="510" height="280" fill="#1e1e1e"/>
+  <text x="190" y="40" fill="#9da5b4" font-size="13" font-family="monospace">hello.c</text>
+  <line x1="170" y1="52" x2="680" y2="52" stroke="#3c3c3c"/>
+  <text x="186" y="86" fill="#c586c0" font-size="13" font-family="monospace">#include &lt;stdio.h&gt;</text>
+  <text x="186" y="116" fill="#569cd6" font-size="13" font-family="monospace">int <tspan fill="#dcdcaa">main</tspan>() {</text>
+  <text x="206" y="140" fill="#d4d4d4" font-size="13" font-family="monospace"><tspan fill="#569cd6">printf</tspan>(<tspan fill="#ce9178">"Hello, C!\n"</tspan>);</text>
+  <text x="206" y="164" fill="#d4d4d4" font-size="13" font-family="monospace"><tspan fill="#c586c0">return</tspan> 0;</text>
+  <text x="186" y="188" fill="#569cd6" font-size="13" font-family="monospace">}</text>
+  <rect x="186" y="214" width="14" height="16" fill="#fff"/>
+</svg>
+  <div class="cap">图 4：在 hello.c 里写代码（示意图，含语法高亮）</div>
+</div>
+<div class="box ok"><b>记住：</b>写完后按 <code>Ctrl+S</code>（Mac <code>Cmd+S</code>）保存。不保存就编译，跑的是旧文件。</div>
+
+<h2>5. 编译并运行（两平台命令不同）</h2>
+<p>打开集成终端（<code>Ctrl+`</code>），<b>先 cd 到文件所在目录</b>，再执行编译命令。</p>
+
+<div class="twocol">
+  <div>
+    <h3><span class="tag win">Windows · gcc</span></h3>
+    <pre>gcc hello.c -o hello
+hello</pre>
+    <p class="lead">首行把 <code>hello.c</code> 编译成 <code>hello.exe</code>；第二行运行它。也可合并成一行：</p>
+    <pre>gcc hello.c -o hello &amp;&amp; hello</pre>
+  </div>
+  <div>
+    <h3><span class="tag mac">macOS · clang</span></h3>
+    <pre>clang hello.c -o hello
+./hello</pre>
+    <p class="lead">注意 Mac 运行要加 <code>./</code> 前缀（表示「当前目录」）。也可合并：</p>
+    <pre>clang hello.c -o hello &amp;&amp; ./hello</pre>
+  </div>
+</div>
+
+<div class="fig">
+<svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="680" height="200" fill="#1e1e1e"/>
+  <text x="20" y="26" fill="#569cd6" font-size="13" font-family="monospace">终端</text>
+  <line x1="0" y1="38" x2="680" y2="38" stroke="#3c3c3c"/>
+  <text x="20" y="66" fill="#d4d4d4" font-size="13" font-family="monospace">$ gcc hello.c -o hello</text>
+  <text x="20" y="94" fill="#d4d4d4" font-size="13" font-family="monospace">$ hello          <tspan fill="#6a9955"># Windows</tspan></text>
+  <text x="20" y="122" fill="#d4d4d4" font-size="13" font-family="monospace">$ ./hello        <tspan fill="#6a9955"># macOS</tspan></text>
+  <text x="20" y="156" fill="#ce9178" font-size="14" font-weight="700" font-family="monospace">Hello, C!</text>
+  <text x="20" y="184" fill="#6a9955" font-size="12" font-family="monospace">^ 这就是程序输出，说明编译运行成功 ✓</text>
+</svg>
+  <div class="cap">图 5：编译并运行，输出 "Hello, C!"（示意图）</div>
+</div>
+
+<div class="box tip"><b>偷懒法（可选）：</b>装扩展 <b>Code Runner</b>，右上角出现 ▶ 按钮，点一下自动编译运行，不用记命令。但<b>学 C 语言建议先用手敲命令</b>，理解「编译 → 运行」两步，考试和排错都用得上。</div>
+
+<h2>6. 常见中文报错与解决</h2>
+<table>
+  <tr><th>报错现象</th><th>原因</th><th>解决办法</th></tr>
+  <tr><td><code>'gcc' 不是内部或外部命令</code><br>（Windows）</td><td>MinGW 的 bin 没加入 PATH，或装完没重开终端</td><td>把 <code>C:\msys64\ucrt64\bin</code> 加入 PATH，<b>重启 VS Code</b> 再试</td></tr>
+  <tr><td><code>clang: command not found</code><br>（Mac）</td><td>没装 Xcode 命令行工具</td><td>终端执行 <code>xcode-select --install</code></td></tr>
+  <tr><td><code>zsh: permission denied: hello</code><br>（Mac）</td><td>忘了 <code>./</code> 前缀</td><td>改用 <code>./hello</code> 而不是 <code>hello</code></td></tr>
+  <tr><td><code>无法打开输出文件 hello.exe</code><br>（Windows）</td><td>上一次程序还在运行，文件被占用</td><td>终端按 <code>Ctrl+C</code> 结束旧进程，再编译</td></tr>
+  <tr><td>输出中文乱码</td><td>旧版 Windows 终端编码问题</td><td>用 VS Code 集成终端一般正常；仍乱码就在 cmd 里先 <code>chcp 65001</code></td></tr>
+  <tr><td><code>fatal error: xxx.h: No such file</code></td><td>文件名拼错 / 没保存 / 不在当前目录</td><td>核对 <code>#include</code> 拼写，<code>cd</code> 到正确目录，先保存</td></tr>
+</table>
+
+<h2>7. 和 Dev-C++ 的关系</h2>
+<div class="box ok">
+  <b>重点：同一份 <code>.c</code> 文件，Dev-C++ 和 VS Code 都能编译，代码 100% 通用。</b><br>
+  你在课上用 Dev-C++ 写的作业，拿到 Mac 上用 VS Code + clang 一样能跑；反过来也一样。区别只在「谁帮你按下了编译按钮」，底层都是标准 C 编译器。
+</div>
+<p class="lead">所以：Windows 同学直接用学习通里的 Dev-C++ 安装包；Mac 同学走路线②在线编译器（或进阶路线③ VS Code），作业代码直接复制过去就能交。</p>
+
+<div class="foot">
+  文档性质：教学辅助图文指南（示意图均为界面模拟，非真实截图）。<br>
+  适用课程：C 语言程序设计（2026-2027-1 学期）。生成日期：2026-10-11。
+</div>
+
+</div>
+</body>
+</html>
